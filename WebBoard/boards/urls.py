@@ -1,9 +1,9 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    re_path(r'^boards/(?P<pk>\d+)/$', views.board_topics, name='board_topics'),
-    re_path(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic')
+    path('boards/<pk>/', views.board_topics, name='board_topics'),
+    path('boards/<pk>/new/', views.new_topic, name='new_topic')
 ]
