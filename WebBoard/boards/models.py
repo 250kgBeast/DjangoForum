@@ -21,7 +21,7 @@ class Board(models.Model):
 
 class Topic(models.Model):
     subject = models.CharField(max_length=225, unique=True)
-    last_updated = models.DateField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now_add=True, null=True)
     board = models.ForeignKey(Board, related_name='topics', on_delete=models.CASCADE)
     starter = models.ForeignKey(User, related_name='topics', on_delete=models.SET('deleted user'))
     views = models.PositiveIntegerField(default=0)
@@ -33,8 +33,8 @@ class Topic(models.Model):
 class Post(models.Model):
     message = models.TextField(max_length=400)
     topic = models.ForeignKey(Topic, related_name='posts', on_delete=models.CASCADE)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, related_name='posts', on_delete=models.SET('deleted user'))
     updated_by = models.ForeignKey(User, null=True, related_name='+', on_delete=models.SET('deleted user'))
 
