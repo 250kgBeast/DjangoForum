@@ -96,3 +96,11 @@ class InvalidReplyTopicTests(ReplyTopicTestCase):
     def test_form_errors(self):
         form = self.response.context.get('form')
         self.assertTrue(form.errors)
+
+    def test_redirection(self):
+        """
+        A valid form submission should redirect the user
+        """
+        url = reverse('topic_posts', kwargs={'pk': self.board.pk, 'topic_pk': self.topic.pk})
+        topic_posts_url = f'{url}?page=1#2'
+        self.assertRedirects(self.response, topic_posts_url)

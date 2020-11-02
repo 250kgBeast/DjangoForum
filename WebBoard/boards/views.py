@@ -4,6 +4,7 @@ from django.views.generic import UpdateView, ListView
 from django.db.models import Count
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from .forms import NewTopicForm, PostForm
 from .models import Board, Post, Topic
@@ -59,8 +60,11 @@ class PostListView(ListView):
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
-        self.topic.views += 1
-        self.topic.save()
+        session_key = 'viewed_topic_{}'.format(self.topic.pk)
+        if not self.request.session.get(session_key, False):
+            self.topic.views += 1
+            self.topic.save()
+            self.request.session[session_key] = True
         kwargs['topic'] = self.topic
         return super().get_context_data(**kwargs)
 
@@ -85,7 +89,10 @@ def reply_topic(request, pk, topic_pk):
             topic.last_updated = timezone.now()
             topic.save()
 
-            return redirect('topic_posts', pk=pk, topic_pk=topic_pk)
+            topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
+            topic_post_url = f'{topic_url}?page={topic.get_page_count()}#{post.pk}'
+
+            return redirect(topic_post_url)
     else:
         form = PostForm()
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
